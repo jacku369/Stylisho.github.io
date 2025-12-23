@@ -199,9 +199,7 @@ function generateStyles() {
   const name = document.getElementById('nameInput').value.trim();
   const result = document.getElementById('result');
   const resultsCount = document.getElementById('resultsCount');
-  
   result.innerHTML = "";
-  
   if (!name) {
     result.innerHTML = `
       <div class="empty-state">
@@ -212,6 +210,38 @@ function generateStyles() {
     resultsCount.textContent = "0";
     return;
   }
+
+  // 👉 FIX 1: Get ALL styles of selected category
+  const filteredStyles = styles.filter(s => s.type === currentFilter);
+
+  if (filteredStyles.length === 0) return;
+
+  // 👉 FIX 2: Random shuffle (har bar order change)
+  const shuffled = filteredStyles.sort(() => Math.random() - 0.5);
+
+  let count = 0;
+
+  shuffled.forEach(style => {
+    const styledName =
+      style.prefix +
+      convert(name, style.map) +
+      style.suffix;
+
+    const div = document.createElement('div');
+    div.className = `style-box ${currentFilter}`;
+    div.innerHTML = `
+      <span class="style-text">${styledName}</span>
+      <button class="copy-btn" onclick="copyText('${styledName.replace(/'/g, "\\'")}')">
+        <i class="fas fa-copy"></i> Copy
+      </button>
+    `;
+
+    result.appendChild(div);
+    count++;
+  });
+
+  resultsCount.textContent = count;
+}
   
   // Get the style for current category
   const style = styles.find(s => s.type === currentFilter);
